@@ -5,40 +5,44 @@ Cu.import('resource://gre/modules/Services.jsm');
 
 var patternsToBlock = [new RegExp('.*\:\/\/.*\.dhnet.be\/.*','i'), new RegExp('.*\:\/\/.*\www.dhnet.be\/.*','i')];
 
+var observers;
+
 exports.main = function(options) {
-  var observers = {
-     'http-on-examine-response': {
+  observers = {
+     'http-on-modify-request': {
         observe: function(aSubject, aTopic, aData) {
            //console.info('http-on-modify-request: aSubject = ' + aSubject + ' | aTopic = ' + aTopic + ' | aData = ' + aData);
            var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
            var requestUrl = httpChannel.URI.spec;
+
+           console.log(requestUrl);
            for (var i = 0; i < patternsToBlock.length; i++) {
               if (patternsToBlock[i].test(requestUrl)) {
-                 httpChannel.cancel(Cr.NS_BINDING_ABORTED); //or can do redirect instead of cancel like: httpChannel.redirectTo(Services.io.newURI('http://www.google.com', null, null));
-                 //console.log('requestUrl was', requestUrl, 'which mathces blocked pattern:', patternsToBlock[i], 'so blocked it');
-                 break;
+                httpChannel.cancel(Cr.NS_BINDING_ABORTED); //or can do redirect instead of cancel like: httpChannel.redirectTo(Services.io.newURI('http://www.google.com', null, null));
+                console.log('requestUrl was', requestUrl, 'which matches blocked pattern:', patternsToBlock[i], 'so blocked it');
+                break;
               }
            }
            if (requestUrl.indexOf('google.com') > -1) {
 
            }
         },
-        reg: function() {
+        register: function() {
            Services.obs.addObserver(observers['http-on-modify-request'], 'http-on-modify-request', false);
         },
-        unreg: function() {
+        unregister: function() {
            Services.obs.removeObserver(observers['http-on-modify-request'], 'http-on-modify-request');
         }
      }
   };
 
   for (var o in observers) {
-    observers[o].reg();
+    observers[o].register();
   }
 };
 
 exports.onUnload = function(reason) {
   for (var o in observers) {
-    observers[o].unreg();
+    observers[o].unregister();
   }
 };
