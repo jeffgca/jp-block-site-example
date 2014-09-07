@@ -1,10 +1,11 @@
 {
   "title": "Block This Site",
   "name": "block-site",
-  "version": "0.0.0",
+  "id": "block-site@canuckistani",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
-  "author": "",
+  "author": "jeff@canuckistani.ca",
   "engines": {
     "firefox": ">=33.0a1",
     "fennec": ">=33.0a1"

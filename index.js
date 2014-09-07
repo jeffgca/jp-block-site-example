@@ -1,5 +1,3 @@
-var self = require('sdk/self');
-
 const { Ci, Cu, Cc, Cr } = require('chrome');
 Cu.import('resource://gre/modules/Services.jsm');
 
